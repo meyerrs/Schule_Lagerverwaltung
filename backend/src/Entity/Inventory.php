@@ -26,48 +26,73 @@ class Inventory
     #[ORM\Column(type: Types:: STRING)]
     private string $ort;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'verantwortlicher_id', referencedColumnName: 'id', nullable: true)]
+    private User $verantwortlicher;
 
-    public function getID(){
+
+    public function getID() : int
+    {
         return $this->id;
     }
 
-    public function getName(){
+    public function getName() :string
+    {
         return $this->name;
     }
 
-    public function setName(string $name){
+    public function setName(string $name): string
+    {
         return $this->name = $name;
     }
 
-    public function getAbteilung(){
+    public function getAbteilung() : string
+    {
         return $this->abteilung;
     }
 
-    public function setAbteilung(string $abteilung){
+    public function setAbteilung(string $abteilung) : string
+    {
         return $this->abteilung = $abteilung;
     }
 
-    public function getGruppe(){
+    public function getGruppe() : string
+    {
         return $this->gruppe;
     }
 
-    public function setGruppe(string $gruppe){
+    public function setGruppe(string $gruppe) : string
+    {
         return $this->gruppe = $gruppe;
     }
 
-    public function getFach(){
+    public function getFach() : string
+    {
         return $this->fach;
     }
 
-    public function setFach(string $fach){
+    public function setFach(string $fach) :string
+    {
         return $this->fach = $fach;
     }
 
-    public function getOrt(){
+    public function getOrt() : string
+    {
         return $this->ort;
     }
 
-    public function setOrt(string $ort){
+    public function setOrt(string $ort) :string
+    {
         return $this->ort = $ort;
+    }
+
+     public function getVerantwortlicher(): User
+    {
+        return $this->verantwortlicher;
+    }
+
+    public function setVerantwortlicher(User $verantwortlicher): User
+    {
+       return $this->verantwortlicher = $verantwortlicher;
     }
 }
