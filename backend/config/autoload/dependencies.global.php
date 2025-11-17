@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMSetup;
+use Doctrine\DBAL\DriverManager;
+
 return [
     // Provides application-wide services.
     // We recommend using fully-qualified class names whenever possible as
@@ -20,7 +24,24 @@ return [
         ],
         // Use 'factories' for services provided by callbacks/factory classes.
         'factories' => [
-            // Fully\Qualified\ClassName::class => Fully\Qualified\FactoryName::class,
+            EntityManager::class => function (\Psr\Container\ContainerInterface $container) {
+                    $settings = $container->get('config')['doctrine'];
+
+                    $config = ORMSetup::createAttributeMetadataConfiguration(
+                        $settings['metadata_dirs'],
+                        $settings['dev_mode']
+                    );
+
+                    $connection = DriverManager::getConnection(
+                        $settings['connection'],
+                        $config
+                    );
+
+                    return new EntityManager(
+                        $connection,
+                        $config
+                    );
+                },
         ],
     ],
 ];
