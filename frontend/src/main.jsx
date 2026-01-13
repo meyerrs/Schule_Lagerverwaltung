@@ -1,8 +1,8 @@
-import React from "react"
-import ReactDOM from "react-dom/client"
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
 
-function App() {
-  return <h1>Hello from React!</h1>
-}
+// Hier den Pfad zum styles-Ordner anpassen
+import "./styles/index.css";
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />)
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
