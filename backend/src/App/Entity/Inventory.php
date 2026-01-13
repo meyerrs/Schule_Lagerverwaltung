@@ -1,5 +1,6 @@
 <?php
 
+use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -7,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name : 'Inventory')]
 class Inventory
 {
+    #[ORM\Id]
     #[ORM\Column(type: Types:: INTEGER)]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private int $id;
