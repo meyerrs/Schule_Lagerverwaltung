@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Button from "@mui/material/Button";
 
 function Inventory() {
   const [items, setItems] = useState([]);
@@ -42,49 +43,51 @@ function Inventory() {
   };
 
   if (loading) return <p className="p-4">Lade Inventar...</p>;
-
+  
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Inventar</h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-300 rounded-lg">
-          <thead className="bg-gray-100">
-            <tr>
-              {["inventarID", "name", "abteilung", "gruppe", "fach", "ort"].map((col) => (
-                <th
-                  key={col}
-                  onClick={() => requestSort(col)}
-                  className="px-4 py-2 text-left cursor-pointer select-none"
-                >
-                  {col.toUpperCase()}
-                  {sortConfig.key === col ? (
-                    sortConfig.direction === "asc" ? " ▲" : " ▼"
-                  ) : null}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedItems.length === 0 ? (
+    <>
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Inventar</h1>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border border-gray-300 rounded-lg">
+            <thead className="bg-gray-100">
               <tr>
-                <td colSpan="6" className="text-center py-4">Keine Einträge</td>
+                {["inventarID", "name", "abteilung", "gruppe", "fach", "ort"].map((col) => (
+                  <th
+                    key={col}
+                    onClick={() => requestSort(col)}
+                    className="px-4 py-2 text-left cursor-pointer select-none"
+                  >
+                    {col.toUpperCase()}
+                    {sortConfig.key === col ? (
+                      sortConfig.direction === "asc" ? " ▲" : " ▼"
+                    ) : null}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              sortedItems.map((item) => (
-                <tr key={item.inventarID} className="hover:bg-gray-50">
-                  <td className="px-4 py-2">{item.inventarID}</td>
-                  <td className="px-4 py-2">{item.name}</td>
-                  <td className="px-4 py-2">{item.abteilung}</td>
-                  <td className="px-4 py-2">{item.gruppe}</td>
-                  <td className="px-4 py-2">{item.fach}</td>
-                  <td className="px-4 py-2">{item.ort}</td>
+            </thead>
+            <tbody>
+              {sortedItems.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-4">Keine Einträge</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                sortedItems.map((item) => (
+                  <tr key={item.inventarID} className="hover:bg-gray-50">
+                    <td className="px-4 py-2">{item.inventarID}</td>
+                    <td className="px-4 py-2">{item.name}</td>
+                    <td className="px-4 py-2">{item.abteilung}</td>
+                    <td className="px-4 py-2">{item.gruppe}</td>
+                    <td className="px-4 py-2">{item.fach}</td>
+                    <td className="px-4 py-2">{item.ort}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
