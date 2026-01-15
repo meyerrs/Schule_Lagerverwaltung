@@ -8,7 +8,6 @@ use Mezzio\Router\RouterInterface;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Doctrine\ORM\EntityManager;
 
 use function assert;
 
@@ -16,8 +15,14 @@ final class HomePageHandlerFactory
 {
     public function __invoke(ContainerInterface $container): RequestHandlerInterface
     {
-        return new HomePageHandler(
-            $container->get(EntityManager::class),
-        );
+        $router = $container->get(RouterInterface::class);
+        assert($router instanceof RouterInterface);
+
+        $template = $container->has(TemplateRendererInterface::class)
+            ? $container->get(TemplateRendererInterface::class)
+            : null;
+        assert($template instanceof TemplateRendererInterface || null === $template);
+
+        return new HomePageHandler($container::class, $router, $template);
     }
 }
