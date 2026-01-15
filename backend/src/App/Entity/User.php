@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -23,8 +25,14 @@ class User
     #[ORM\Column(type: Types::STRING)]
     private string $password;
 
-    #[ORM\Column(type: Types::STRING)]
-    private string $role = "Lehrer";
+    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
+    #[ORM\JoinTable(name: 'user_role')]
+    private Collection $roles;
+
+    public function __construct()
+    {
+        $this->roles = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -67,15 +75,24 @@ class User
         return $this;
     }
 
-    public function getRole(): string
+    public function addRole(Role $role): self
     {
-        return $this->getRole();
+        if (!$this->roles->contains($role)) {
+            $this->roles->add($role);
+            $role->addUser($this);
+        }
+        return $this;
     }
 
-    public function setRole(string $role): self
+    public function removeRole(Role $role): self
     {
-        $this->role = $role;
-
+        $this->roles->removeElement($role);
+        $role->removeUser($this);
         return $this;
+    }
+
+    public function getRoles(): Collection
+    {
+        return $this->roles;
     }
 }
