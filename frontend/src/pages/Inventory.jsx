@@ -46,6 +46,11 @@ function Inventory() {
   
   return (
     <>
+    <div style={{ padding: 20 }}>
+      <Button variant="contained" color="primary">
+        MUI funktioniert 🚀
+      </Button>
+    </div>
       <div className="p-4">
         <h1 className="text-2xl font-bold mb-4">Inventar</h1>
         <div className="overflow-x-auto">
