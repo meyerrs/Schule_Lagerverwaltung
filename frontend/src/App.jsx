@@ -1,17 +1,21 @@
 import React, { useState } from "react";
 import Inventory from "./pages/Inventory";
+import Login from "./pages/Login";
 
 function App() {
-  const [page, setPage] = useState("inventory");
+  const [loggedIn, setLoggedIn] = useState(false);
 
   return (
     <div>
-      <header>
-        <button onClick={() => setPage("inventory")}>Inventar</button>
-      </header>
+      {loggedIn && (
+        <header>
+          <button onClick={() => setLoggedIn(false)}>Logout</button>
+        </header>
+      )}
 
       <main>
-        {page === "inventory" && <Inventory />}
+        {!loggedIn && <Login onLogin={() => setLoggedIn(true)} />}
+        {loggedIn && <Inventory />}
       </main>
     </div>
   );
