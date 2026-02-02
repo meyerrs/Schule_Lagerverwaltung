@@ -1,19 +1,26 @@
-import React, { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Inventory from "./pages/Inventory";
+import Login from "./pages/Login";
 
 function App() {
-  const [page, setPage] = useState("inventory");
+  const isLoggedIn = false; // später State / Context
 
   return (
-    <div>
-      <header>
-        <button onClick={() => setPage("inventory")}>Inventar</button>
-      </header>
+    <Routes>
+      {/* Startseite */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
-      <main>
-        {page === "inventory" && <Inventory />}
-      </main>
-    </div>
+      <Route path="/login" element={<Login />} />
+
+      <Route
+        path="/inventory"
+        element={
+          isLoggedIn ? <Inventory /> : <Navigate to="/login" replace />
+        }
+      />
+
+      <Route path="*" element={<h1>404 – Seite nicht gefunden</h1>} />
+    </Routes>
   );
 }
 
