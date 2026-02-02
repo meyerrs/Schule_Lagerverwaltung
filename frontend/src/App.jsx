@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Inventory from "./pages/Inventory";
 import Login from "./pages/Login";
 

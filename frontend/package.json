@@ -15,7 +15,8 @@
     "@mui/material": "^7.3.7",
     "@mui/material-nextjs": "^7.3.7",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.13.0"
   },
   "scripts": {
     "dev": "vite",
