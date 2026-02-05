@@ -1,4 +1,4 @@
 node_modules
 dist/
 .next/
-backend/config/autoload/doctrine.global.php
+/backend/config/autoload/doctrine.global.php
