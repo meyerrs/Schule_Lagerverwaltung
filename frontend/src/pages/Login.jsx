@@ -20,7 +20,7 @@ function Login() {
     setLoading(true);
 
     // Beispiel: später an PHP-Endpunkt schicken
-    fetch("/api/login.php", {
+    fetch("http://127.0.0.1:8080/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

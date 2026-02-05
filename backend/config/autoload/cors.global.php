@@ -1,11 +1,15 @@
 <?php
+// In config/autoload/cors.global.php
+declare(strict_types=1);
+
+use Mezzio\Cors\Configuration\ConfigurationInterface;
+
 return [
-    'cors' => [
-        "origin" => ["http://localhost:3000"], // Hier DEINE Frontend-URL eintragen
-        "methods" => ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        "headers.allow" => ["Authorization", "Content-Type", "X-Requested-With"],
-        "headers.expose" => [],
-        "credentials" => true, 
-        "cache" => 0,
+    ConfigurationInterface::CONFIGURATION_IDENTIFIER => [
+        'allowedOrigins' => ['http://localhost:5173'], 
+        'allowedHeaders' => ['Content-Type', 'Authorization', 'X-Requested-With'], 
+        'allowedMaxAge' => '600', 
+        'credentialsAllowed' => true, 
+        'exposedHeaders' => ['X-Custom-Header'],
     ],
 ];
