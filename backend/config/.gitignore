@@ -1,1 +1,2 @@
 development.config.php
+backend/config/autoload/doctrine.global.php
