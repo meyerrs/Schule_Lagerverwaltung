@@ -21,7 +21,8 @@ class LoginHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $body = $request->getParsedBody();
+        $json = $request->getBody()->getContents();
+        $body = json_decode($json, true);
 
         if (
             !isset($body['username'])

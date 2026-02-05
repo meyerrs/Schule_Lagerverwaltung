@@ -23,6 +23,7 @@ function Login() {
     fetch("http://127.0.0.1:8080/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ username, password }),
     })
       .then(res => res.json())
