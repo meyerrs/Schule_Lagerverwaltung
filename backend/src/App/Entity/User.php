@@ -17,6 +17,9 @@ class User
     private int $id;
 
     #[ORM\Column(type: Types::STRING)]
+    private string $username;
+
+    #[ORM\Column(type: Types::STRING)]
     private string $firstname;
 
     #[ORM\Column(type: Types::STRING)]
@@ -37,6 +40,18 @@ class User
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
     }
 
     public function getFirstname(): string

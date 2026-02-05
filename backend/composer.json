@@ -55,8 +55,11 @@
         "laminas/laminas-servicemanager": "^3.22",
         "laminas/laminas-stdlib": "^3.21",
         "mezzio/mezzio": "^3.23.1",
+        "mezzio/mezzio-cors": "^1.15",
         "mezzio/mezzio-fastroute": "^3.11.0",
         "mezzio/mezzio-helpers": "^5.20",
+        "mezzio/mezzio-session": "^1.17",
+        "mezzio/mezzio-session-ext": "*",
         "roave/psr-container-doctrine": "^5.2"
     },
     "require-dev": {
