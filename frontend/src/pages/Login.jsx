@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
-function Login() {
+function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,10 +26,9 @@ function Login() {
       credentials: "include",
       body: JSON.stringify({ username, password }),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then(() => {
         setLoading(false);
-        console.log("Login Antwort:", data);
+        onLogin();
         // hier z.B. Token speichern / redirect
       })
       .catch(err => {

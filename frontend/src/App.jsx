@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
 
+  console.log('App loggedIn: ', loggedIn);
+
   return (
     <>
       {loggedIn && (
