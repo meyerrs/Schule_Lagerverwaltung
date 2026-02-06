@@ -2,7 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import Admin from "./pages/Admin"
+import Inventory from "./pages/Inventory";
+//hier import für den Skip-Login
+
+
+
 
 // nur für Entwicklung
 const SKIP_LOGIN = true;
@@ -10,7 +14,7 @@ const SKIP_LOGIN = true;
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     {SKIP_LOGIN ? (
-      <Admin />
+      <Inventory /> //Hier Komponente angeben, welche geladen werden soll
     ) : (
       <BrowserRouter>
         <App />
