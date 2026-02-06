@@ -3,17 +3,18 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import Inventory from "./pages/Inventory";
+//hier import für den Skip-Login
 
 
 
 
 // nur für Entwicklung
-const PREVIEW_INVENTORY = true;
+const SKIP_LOGIN = true;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    {PREVIEW_INVENTORY ? (
-      <Inventory />
+    {SKIP_LOGIN ? (
+      <Inventory /> //Hier Komponente angeben, welche geladen werden soll
     ) : (
       <BrowserRouter>
         <App />
