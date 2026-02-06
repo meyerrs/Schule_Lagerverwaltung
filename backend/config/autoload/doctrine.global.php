@@ -1,3 +1,4 @@
+@ -1,32 +0,0 @@
 <?php
 
 declare(strict_types=1);

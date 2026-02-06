@@ -3,9 +3,10 @@
 namespace App\Handler;
 
 use App\Entity\User;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Laminas\Diactoros\Response\JsonResponse;
 use Mezzio\Session\SessionInterface;
+use Psalm\Report\JsonReport;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,7 +22,8 @@ class LoginHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $body = $request->getParsedBody();
+        $json = $request->getBody()->getContents();
+        $body = json_decode($json, true);
 
         if (
             !isset($body['username'])
@@ -42,8 +44,10 @@ class LoginHandler implements RequestHandlerInterface
         ) {
             return $this->responseFactory->createResponse(401);
         }
-
+        
+        $date = new \DateTimeImmutable('+20 minutes');
         $session->set('user_id', $user->getId());
+        $session->set('experation_timestamp', $date->getTimestamp());
         
         return $this->responseFactory->createResponse(200);
     }

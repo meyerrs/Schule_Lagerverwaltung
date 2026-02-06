@@ -10,6 +10,11 @@ if (PHP_SAPI === 'cli-server' && $_SERVER['SCRIPT_FILENAME'] !== __FILE__) {
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
 
+ini_set('session.cookie_samesite', 'Lax');
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 0); // Wichtig: 0 für localhost ohne HTTPS
+ini_set('session.cookie_domain', '');
+
 /**
  * Self-called anonymous function that creates its own scope and keeps the global namespace clean.
  */
