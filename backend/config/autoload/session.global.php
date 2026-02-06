@@ -1,9 +1,18 @@
 <?php
 
 return [
+    // Laminas Session Config (wird von der Factory oft hier erwartet)
     'session_config' => [
         'cookie_httponly' => true,
-        'cookie_secure'   => false, // Muss auf false sein, wenn du KEIN https nutzt (lokal)
-        'cookie_samesite' => 'Lax',   // 'Lax' erlaubt das Senden bei Cross-Origin Requests in modernen Browsern
+        'cookie_secure'   => false,
+        'cookie_samesite' => 'Lax',
+    ],
+    // Manche Mezzio-Setups brauchen es zusätzlich flach im 'session' Key
+    'session' => [
+        'persistence' => [
+            'ext' => [
+                'cookie_samesite' => 'Lax',
+            ],
+        ],
     ],
 ];

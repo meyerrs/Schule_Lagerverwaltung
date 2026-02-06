@@ -6,7 +6,7 @@ use Mezzio\Cors\Configuration\ConfigurationInterface;
 
 return [
     ConfigurationInterface::CONFIGURATION_IDENTIFIER => [
-        'allowedOrigins' => ['http://localhost:5173'], 
+        'allowedOrigins' => ['http://127.0.0.1:5173'], 
         'allowedHeaders' => ['Content-Type', 'Authorization', 'X-Requested-With', 'Cookie'], 
         'allowedMaxAge' => '600', 
         'credentialsAllowed' => true, 
