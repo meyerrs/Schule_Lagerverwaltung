@@ -29,6 +29,10 @@ class AuthenticationHandler implements RequestHandlerInterface
 
         $id = $session->get('user_id');
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
+        if ($user === null) {
+            $session->clear();
+            return $this->responseFactory->createResponse(401);
+        }
 
         return (new JsonResponse([
             'username' => $user->getUsername(),

@@ -2,8 +2,6 @@
 
 namespace App\Middleware;
 
-use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -21,8 +19,9 @@ class AuthenticationMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $session = $request->getAttribute(SessionInterface::class);
+        $path = $request->getUri()->getPath();
 
-        if ($request->getUri()->getPath() === "/api/login") {
+        if (in_array($path, ['/api/login', '/api/logout'], true)) {
             return $handler->handle($request);
         }
 
@@ -40,8 +39,7 @@ class AuthenticationMiddleware implements MiddlewareInterface
             $session->clear();
             return $this->responseFactory->createResponse(401);
         }
-        return $handler->handle($request);
 
-        return $this->responseFactory->createResponse(401);
+        return $handler->handle($request);
     }
 }
