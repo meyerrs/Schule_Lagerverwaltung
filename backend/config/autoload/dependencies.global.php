@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Handler\AuthenticationHandler;
+use App\Handler\InventoryFetchHandler;
 use App\Handler\LoginHandler;
 use App\Handler\LogoutHandler;
 use App\Middleware\AuthenticationMiddleware;
@@ -35,6 +36,12 @@ return [
             App\Handler\LogoutHandler::class => function(ContainerInterface $container) {
                 return new LogoutHandler(
                     $container->get(ResponseFactoryInterface::class)
+                );
+            },
+            App\Handler\InventoryFetchHandler::class => function(ContainerInterface $container) {
+                return new InventoryFetchHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
                 );
             },
 
