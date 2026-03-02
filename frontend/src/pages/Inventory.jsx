@@ -1,97 +1,259 @@
 import React, { useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
-import { Button, Stack } from "@mui/material";
+import {
+  DataGrid,
+  GridActionsCellItem,
+  GridRowModes
+} from "@mui/x-data-grid";
+
+import {
+  Typography,
+  Button,
+  Box
+} from "@mui/material";
+
+import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+import CloseIcon from "@mui/icons-material/Close";
+
+// ✅ User Dropdown Optionen
+const users = [
+  { value: "max", label: "Max Mustermann" },
+  { value: "anna", label: "Anna Schmidt" },
+  { value: "tom", label: "Tom Müller" }
+];
 
 function Inventory() {
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [rowModesModel, setRowModesModel] = useState({});
+
+  // ✅ Testdaten
   useEffect(() => {
-    fetch("/api/inventory.php")
-      .then(res => res.json())
-      .then(data => {
-        setItems(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Fehler beim Laden:", err);
-        setLoading(false);
-      });
+    setItems([
+      {
+        inventarID: 1,
+        name: "Laptop Dell XPS",
+        abteilung: "IT",
+        gruppe: "Hardware",
+        fach: "A1",
+        ort: "Büro 101",
+        verantwortlicher: "max"
+      }
+    ]);
+
+    setLoading(false);
   }, []);
 
-  const handleEdit = (row) => {
-    console.log("Bearbeiten:", row);
-    // z.B. Dialog öffnen
+  // ➕ Neue Zeile
+  const handleAddClick = () => {
+    const id = Date.now();
+
+    setItems(prev => [
+      ...prev,
+      {
+        inventarID: id,
+        name: "",
+        abteilung: "",
+        gruppe: "",
+        fach: "",
+        ort: "",
+        verantwortlicher: "",
+        isNew: true
+      }
+    ]);
+
+    setRowModesModel(prev => ({
+      ...prev,
+      [id]: { mode: GridRowModes.Edit }
+    }));
   };
 
-  const handleDelete = (id) => {
+  // ✏️ Bearbeiten starten
+  const handleEditClick = (id) => {
+    setRowModesModel(prev => ({
+      ...prev,
+      [id]: { mode: GridRowModes.Edit }
+    }));
+  };
+
+  // ✅ Speichern (nur Mode wechseln – Grid übernimmt Update)
+  const handleSaveClick = (id) => {
+    setRowModesModel(prev => ({
+      ...prev,
+      [id]: { mode: GridRowModes.View }
+    }));
+  };
+
+  // ❌ Abbrechen
+  const handleCancelClick = (id) => {
+
+    const row = items.find(r => r.inventarID === id);
+
+    if (row?.isNew) {
+      setItems(prev => prev.filter(r => r.inventarID !== id));
+    }
+
+    setRowModesModel(prev => ({
+      ...prev,
+      [id]: {
+        mode: GridRowModes.View,
+        ignoreModifications: true
+      }
+    }));
+  };
+
+  // 🗑 Löschen
+  const handleDeleteClick = (id) => {
     if (!window.confirm("Wirklich löschen?")) return;
 
-    console.log("Löschen:", id);
-    // API DELETE → danach setItems(...)
+    setItems(prev => prev.filter(row => row.inventarID !== id));
   };
 
+  // 🔥 Row Update Pipeline (WICHTIG!)
+  const processRowUpdate = (newRow) => {
+
+    const updatedRow = {
+      ...newRow,
+      isNew: false
+    };
+
+    setItems(prev =>
+      prev.map(row =>
+        row.inventarID === newRow.inventarID
+          ? updatedRow
+          : row
+      )
+    );
+
+    return updatedRow;
+  };
+
+  // 📊 Columns
   const columns = [
+
     { field: "inventarID", headerName: "ID", width: 90 },
-    { field: "name", headerName: "Name", flex: 1 },
-    { field: "abteilung", headerName: "Abteilung", flex: 1 },
-    { field: "gruppe", headerName: "Gruppe", flex: 1 },
-    { field: "fach", headerName: "Fach", flex: 1 },
-    { field: "ort", headerName: "Ort", flex: 1 },
+
+    { field: "name", headerName: "Name", flex: 1, editable: true },
+
+    { field: "abteilung", headerName: "Abteilung", flex: 1, editable: true },
+
+    { field: "gruppe", headerName: "Gruppe", flex: 1, editable: true },
+
+    { field: "fach", headerName: "Fach", flex: 1, editable: true },
+
+    { field: "ort", headerName: "Ort", flex: 1, editable: true },
+
+    {
+      field: "verantwortlicher",
+      headerName: "Verantwortlicher",
+      flex: 1,
+      editable: true,
+      type: "singleSelect",
+      valueOptions: users,
+      valueFormatter: (params) => {
+        const user = users.find(u => u.value === params.value);
+        return user ? user.label : "";
+      }
+    },
+
     {
       field: "actions",
+      type: "actions",
       headerName: "Aktionen",
-      width: 180,
-      sortable: false,
-      renderCell: (params) => (
-        <Stack direction="row" spacing={1}>
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            startIcon={<EditIcon />}
-            onClick={() => handleEdit(params.row)}
-          >
-            Bearbeiten
-          </Button>
-          <Button
-            size="small"
-            variant="outlined"
-            color="error"
-            startIcon={<DeleteIcon />}
-            onClick={() => handleDelete(params.row.inventarID)}
-          >
-            Löschen
-          </Button>
-        </Stack>
-      )
+      width: 130,
+
+      getActions: (params) => {
+
+        const isInEditMode =
+          rowModesModel[params.id]?.mode === GridRowModes.Edit;
+
+        if (isInEditMode) {
+          return [
+
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label="Speichern"
+              onClick={() => handleSaveClick(params.id)}
+            />,
+
+            <GridActionsCellItem
+              icon={<CloseIcon />}
+              label="Abbrechen"
+              onClick={() => handleCancelClick(params.id)}
+            />
+
+          ];
+        }
+
+        return [
+
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="Bearbeiten"
+            onClick={() => handleEditClick(params.id)}
+          />,
+
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Löschen"
+            onClick={() => handleDeleteClick(params.id)}
+          />
+
+        ];
+      }
     }
   ];
 
   return (
     <div style={{ padding: 24 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 16 }}>
-        Inventar
-      </h1>
 
-      <div style={{ height: 600, width: "100%" }}>
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Inventar
+      </Typography>
+
+      <div style={{ height: 500, width: "100%" }}>
+
         <DataGrid
           rows={items}
           columns={columns}
           loading={loading}
-          pageSize={10}
-          rowsPerPageOptions={[10, 25, 50]}
-          disableRowSelectionOnClick
           getRowId={(row) => row.inventarID}
+          editMode="row"
+          rowModesModel={rowModesModel}
+          onRowModesModelChange={setRowModesModel}
+
+          processRowUpdate={processRowUpdate}
+
+          onRowEditStop={(params, event) => {
+            event.defaultMuiPrevented = true;
+          }}
+
+          disableRowSelectionOnClick
+
+          experimentalFeatures={{ newEditingApi: true }}
+
           sx={{
             backgroundColor: "#fff",
             borderRadius: 2,
-            boxShadow: 2,
+            boxShadow: 2
           }}
         />
       </div>
+
+      <Box sx={{ mt: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleAddClick}
+        >
+          Hinzufügen
+        </Button>
+      </Box>
+
     </div>
   );
 }
