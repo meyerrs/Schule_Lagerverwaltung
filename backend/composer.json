@@ -105,6 +105,7 @@
         "enable-codestandard": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
+        "seed": "php bin/seed.php",
         "serve": [
             "Composer\\Config::disableProcessTimeout",
             "php -S 0.0.0.0:8080 -t public/"
@@ -116,6 +117,7 @@
     },
     "scripts-descriptions": {
         "clear-config-cache": "Clears merged config cache. Required for config changes to be applied.",
+        "seed": "Seeds local/test data. Profiles: minimal|dev|demo via -- --profile=<name>.",
         "static-analysis": "Run static analysis tool Psalm.",
         "static-analysis-update-baseline": "Run static analysis tool Psalm and update baseline."
     }
