@@ -47,4 +47,5 @@ return static function (Application $app, MiddlewareFactory $factory, ContainerI
     $app->get('/api/isAuth', App\Handler\AuthenticationHandler::class, 'api.isAuth');
     $app->get('/api/logout', App\Handler\LogoutHandler::class, 'api.logout');
     $app->get('/api/inventory', App\Handler\InventoryFetchHandler::class, 'api.inventoryFetch');
+    $app->delete('/api/inventory', App\Handler\InventoryDeleteHandler::class, 'api.inventoryDelete');
 };
