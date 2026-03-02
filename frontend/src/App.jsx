@@ -24,11 +24,19 @@ function App() {
       .catch(error => console.error('Fehler:', error));
   }, []);
 
+  const handleLogout = () => {
+    fetch('http://127.0.0.1:8080/api/logout', {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(setLoggedIn(false));
+  }
+
   return (
     <>
       {loggedIn && (
         <header>
-          <button onClick={() => setLoggedIn(false)}>Logout</button>
+          <button onClick={handleLogout}>Logout</button>
         </header>
       )}
 

@@ -9,7 +9,7 @@ import Inventory from "./pages/Inventory";
 
 
 // nur für Entwicklung
-const SKIP_LOGIN = true;
+const SKIP_LOGIN = false;
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
