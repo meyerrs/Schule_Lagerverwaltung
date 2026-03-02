@@ -1,10 +1,25 @@
-@ -1,32 +0,0 @@
 <?php
-
 declare(strict_types=1);
 
 use Doctrine\DBAL\Driver\PDO\MySQL\Driver;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
+
+$env = static function (string $key, ?string $default = null): ?string {
+    $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+    if ($value !== false && $value !== null && $value !== '') {
+        return (string) $value;
+    }
+
+    static $dotenv = null;
+    if ($dotenv === null) {
+        $dotenvPath = dirname(__DIR__, 2) . '/.env';
+        $dotenv = is_file($dotenvPath) ? (parse_ini_file($dotenvPath, false, INI_SCANNER_RAW) ?: []) : [];
+    }
+
+    return isset($dotenv[$key]) && $dotenv[$key] !== ''
+        ? (string) $dotenv[$key]
+        : $default;
+};
 
 return [
     'doctrine' => [
@@ -12,10 +27,11 @@ return [
             'orm_default' => [
                 'params' => [
                     'driverClass' => Driver::class,
-                    'host'        => '127.0.0.1',
-                    'user'        => 'admin',
-                    'password'    => 'password', // Dein Passwort hier eintragen
-                    'dbname'      => 'schule_lagerverwaltung', // Dein DB-Name hier eintragen
+                    'host'        => $env('DATABASE_HOST', '127.0.0.1'),
+                    'port'        => (int) $env('DATABASE_PORT', '3306'),
+                    'user'        => $env('DATABASE_USER', 'admin'),
+                    'password'    => $env('DATABASE_PASSWORD', ''),
+                    'dbname'      => $env('DATABASE_NAME', ''),
                     'charset'     => 'utf8mb4',
                 ],
             ],

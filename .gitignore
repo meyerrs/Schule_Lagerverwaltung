@@ -3,7 +3,9 @@ dist/
 .next/
 config/autoload/doctrine.global.php
 
+
 .env
+backend/.env
 
 pnpm-lock.yaml
 pnpm-workspace.yaml
