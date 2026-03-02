@@ -3,19 +3,20 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Button, Stack } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import apiClient from "../api/client";
 
 function Inventory() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/inventory.php")
-      .then(res => res.json())
-      .then(data => {
-        setItems(data);
+    apiClient
+      .get("/api/inventory.php")
+      .then((res) => {
+        setItems(res.data);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Fehler beim Laden:", err);
         setLoading(false);
       });

@@ -1,34 +1,50 @@
-import { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Inventory from "./pages/Inventory";
 import Login from "./pages/Login";
-
-
+import { checkAuth, logout } from "./api/auth";
 
 function App() {
+  const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [roles, setRoles] = useState([]);
 
-  useEffect(() => {
-    fetch('http://127.0.0.1:8080/api/isAuth', {
-    method: "GET",
-    credentials: "include",
-    })
-      .then(response => response.json()) // Extrahiert den Body
-      .then(data => {
-          setUsername(data.username);
-          setRoles(data.roles);
-          setLoggedIn(true);
-      })
-      .catch(error => console.error('Fehler:', error));
+  const refreshAuthState = useCallback(async () => {
+    try {
+      const data = await checkAuth();
+      setUsername(data.username);
+      setRoles(data.roles);
+      setLoggedIn(true);
+    } catch (error) {
+      setLoggedIn(false);
+      setUsername("");
+      setRoles([]);
+    }
   }, []);
+
+  useEffect(() => {
+    refreshAuthState();
+  }, [refreshAuthState]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout Fehler:", error);
+    } finally {
+      setLoggedIn(false);
+      setUsername("");
+      setRoles([]);
+      navigate("/login");
+    }
+  };
 
   return (
     <>
       {loggedIn && (
         <header>
-          <button onClick={() => setLoggedIn(false)}>Logout</button>
+          <button onClick={handleLogout}>Logout</button>
         </header>
       )}
 
@@ -39,7 +55,7 @@ function App() {
             loggedIn ? (
               <Navigate to="/inventory" />
             ) : (
-              <Login onLogin={() => setLoggedIn(true)} />
+              <Login onLogin={refreshAuthState} />
             )
           }
         />

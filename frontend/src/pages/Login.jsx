@@ -9,32 +9,32 @@ import {
   Paper
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { login } from "../api/auth";
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage("");
 
-    // Beispiel: später an PHP-Endpunkt schicken
-    fetch("http://127.0.0.1:8080/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ username, password }),
-    })
-      .then(() => {
-        setLoading(false);
-        onLogin();
-        // hier z.B. Token speichern / redirect
-      })
-      .catch(err => {
-        setLoading(false);
-        console.error("Login Fehler:", err);
-      });
+    try {
+      await login(username, password);
+      await onLogin();
+    } catch (err) {
+      if (err?.response?.status === 401) {
+        setErrorMessage("Ungueltiger Benutzername oder Passwort.");
+      } else {
+        setErrorMessage("Anmeldung fehlgeschlagen. Bitte erneut versuchen.");
+      }
+      console.error("Login Fehler:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,6 +85,11 @@ function Login({ onLogin }) {
             >
               {loading ? "Anmelden..." : "Login"}
             </Button>
+            {errorMessage && (
+              <Typography color="error" sx={{ mt: 2 }}>
+                {errorMessage}
+              </Typography>
+            )}
           </Box>
         </Box>
       </Paper>
