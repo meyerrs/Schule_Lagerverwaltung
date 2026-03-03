@@ -14,6 +14,7 @@ function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,10 +27,15 @@ function Login({ onLogin }) {
       credentials: "include",
       body: JSON.stringify({ username, password }),
     })
-      .then(() => {
+      .then(response => {
+        console.log(response.status);
+        if (response.status === 200) {
+            onLogin();
+            // z.B. Weiterleitung zum Login
+        } else {
+          setErrorMessage("Ihre Anmeldedaten sind falsch!");
+        }
         setLoading(false);
-        onLogin();
-        // hier z.B. Token speichern / redirect
       })
       .catch(err => {
         setLoading(false);
@@ -85,6 +91,7 @@ function Login({ onLogin }) {
             >
               {loading ? "Anmelden..." : "Login"}
             </Button>
+            <Typography color="error">{errorMessage}</Typography>
           </Box>
         </Box>
       </Paper>
