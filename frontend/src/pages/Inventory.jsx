@@ -95,5 +95,6 @@ function Inventory() {
     </div>
   );
 }
+//fuß
 
 export default Inventory;
