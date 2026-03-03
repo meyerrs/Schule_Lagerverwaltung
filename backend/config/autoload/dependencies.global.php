@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Handler\AuthenticationHandler;
+use App\Handler\InventoryDeleteHandler;
+use App\Handler\InventoryEditHandler;
+use App\Handler\InventoryFetchHandler;
 use App\Handler\LoginHandler;
 use App\Handler\LogoutHandler;
 use App\Middleware\AuthenticationMiddleware;
@@ -35,6 +38,24 @@ return [
             App\Handler\LogoutHandler::class => function(ContainerInterface $container) {
                 return new LogoutHandler(
                     $container->get(ResponseFactoryInterface::class)
+                );
+            },
+            App\Handler\InventoryFetchHandler::class => function(ContainerInterface $container) {
+                return new InventoryFetchHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
+            App\Handler\InventoryDeleteHandler::class => function(ContainerInterface $container) {
+                return new InventoryDeleteHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
+            App\Handler\InventoryEditHandler::class => function(ContainerInterface $container) {
+                return new InventoryEditHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
                 );
             },
 
