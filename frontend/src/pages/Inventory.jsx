@@ -17,33 +17,43 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 
-
-const users = [
-  { value: "max", label: "Max Mustermann" },
-  { value: "anna", label: "Anna Schmidt" },
-  { value: "tom", label: "Tom Müller" }
-];
-
 function Inventory() {
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [users, setUsers] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
 
 
   useEffect(() => {
-    setItems([
-      {
-        inventarID: 1,
-        name: "Laptop Dell XPS",
-        abteilung: "IT",
-        gruppe: "Hardware",
-        fach: "A1",
-        ort: "Büro 101",
-        verantwortlicher: "max"
-      }
-    ]);
+    fetch('http://127.0.0.1:8080/api/inventory', {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(response => response.json()) // Extrahiert den Body
+      .then(data => {
+          setItems(data);
+      })
+    fetch('http://127.0.0.1:8080/api/inventory', {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(response => response.json()) // Extrahiert den Body
+      .then(data => {
+          console.log(data);
+          setUsers(data);
+      })
+    // setItems([
+    //   {
+    //     inventarID: 1,
+    //     name: "Laptop Dell XPS",
+    //     abteilung: "IT",
+    //     gruppe: "Hardware",
+    //     fach: "A1",
+    //     ort: "Büro 101",
+    //     verantwortlicher: "max"
+    //   }
+    // ]);
 
     setLoading(false);
   }, []);
@@ -55,7 +65,7 @@ function Inventory() {
     setItems(prev => [
       ...prev,
       {
-        inventarID: id,
+        id: id,
         name: "",
         abteilung: "",
         gruppe: "",
@@ -91,10 +101,10 @@ function Inventory() {
   // ❌ Abbrechen
   const handleCancelClick = (id) => {
 
-    const row = items.find(r => r.inventarID === id);
+    const row = items.find(r => r.id === id);
 
     if (row?.isNew) {
-      setItems(prev => prev.filter(r => r.inventarID !== id));
+      setItems(prev => prev.filter(r => r.id !== id));
     }
 
     setRowModesModel(prev => ({
@@ -110,7 +120,7 @@ function Inventory() {
   const handleDeleteClick = (id) => {
     if (!window.confirm("Wirklich löschen?")) return;
 
-    setItems(prev => prev.filter(row => row.inventarID !== id));
+    setItems(prev => prev.filter(row => row.id !== id));
   };
 
 
@@ -123,7 +133,7 @@ function Inventory() {
 
     setItems(prev =>
       prev.map(row =>
-        row.inventarID === newRow.inventarID
+        row.id === newRow.id
           ? updatedRow
           : row
       )
@@ -155,8 +165,9 @@ function Inventory() {
       type: "singleSelect",
       valueOptions: users,
       valueFormatter: (params) => {
-        const user = users.find(u => u.value === params.value);
-        return user ? user.label : "";
+        console.log('params: ', params);
+        const user = users.find(u => u.id === params.verantwortlicher.id);
+        return user ? (user.firstname . user.lastname) : "";
       }
     },
 
@@ -221,7 +232,7 @@ function Inventory() {
           rows={items}
           columns={columns}
           loading={loading}
-          getRowId={(row) => row.inventarID}
+          getRowId={(row) => row.id}
           editMode="row"
           rowModesModel={rowModesModel}
           onRowModesModelChange={setRowModesModel}
