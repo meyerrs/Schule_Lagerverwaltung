@@ -17,7 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 
-// ✅ User Dropdown Optionen
+
 const users = [
   { value: "max", label: "Max Mustermann" },
   { value: "anna", label: "Anna Schmidt" },
@@ -31,7 +31,7 @@ function Inventory() {
 
   const [rowModesModel, setRowModesModel] = useState({});
 
-  // ✅ Testdaten
+
   useEffect(() => {
     setItems([
       {
@@ -48,7 +48,7 @@ function Inventory() {
     setLoading(false);
   }, []);
 
-  // ➕ Neue Zeile
+ 
   const handleAddClick = () => {
     const id = Date.now();
 
@@ -72,7 +72,7 @@ function Inventory() {
     }));
   };
 
-  // ✏️ Bearbeiten starten
+
   const handleEditClick = (id) => {
     setRowModesModel(prev => ({
       ...prev,
@@ -80,7 +80,7 @@ function Inventory() {
     }));
   };
 
-  // ✅ Speichern (nur Mode wechseln – Grid übernimmt Update)
+ 
   const handleSaveClick = (id) => {
     setRowModesModel(prev => ({
       ...prev,
@@ -106,14 +106,14 @@ function Inventory() {
     }));
   };
 
-  // 🗑 Löschen
+
   const handleDeleteClick = (id) => {
     if (!window.confirm("Wirklich löschen?")) return;
 
     setItems(prev => prev.filter(row => row.inventarID !== id));
   };
 
-  // 🔥 Row Update Pipeline (WICHTIG!)
+
   const processRowUpdate = (newRow) => {
 
     const updatedRow = {
@@ -132,7 +132,7 @@ function Inventory() {
     return updatedRow;
   };
 
-  // 📊 Columns
+ 
   const columns = [
 
     { field: "inventarID", headerName: "ID", width: 90 },
