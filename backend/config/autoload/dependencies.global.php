@@ -65,6 +65,12 @@ return [
                     $container->get(EntityManagerInterface::class)
                 );
             },
+            App\Handler\UserEditHandler::class => function(ContainerInterface $container) {
+                return new UserFetchHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
 
             //Middleware
             App\Middleware\AuthenticationMiddleware::class => function(ContainerInterface $container) {

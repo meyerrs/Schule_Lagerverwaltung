@@ -40,7 +40,6 @@ function Inventory() {
     })
       .then(response => response.json()) // Extrahiert den Body
       .then(data => {
-          console.log(data);
           setUsers(data);
       })
     // setItems([
@@ -91,10 +90,10 @@ function Inventory() {
   };
 
  
-  const handleSaveClick = (id) => {
+  const handleSaveClick = (params) => {
     setRowModesModel(prev => ({
       ...prev,
-      [id]: { mode: GridRowModes.View }
+      [params.id]: { mode: GridRowModes.View }
     }));
   };
 
@@ -120,11 +119,50 @@ function Inventory() {
   const handleDeleteClick = (id) => {
     if (!window.confirm("Wirklich löschen?")) return;
 
+    fetch('http://127.0.0.1:8080/api/inventory', {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ "id": id })
+    })
+
     setItems(prev => prev.filter(row => row.id !== id));
   };
 
 
   const processRowUpdate = (newRow) => {
+    console.log('Reihen Änderung: ', newRow);
+
+    if (!newRow.isNew) {
+      fetch('http://127.0.0.1:8080/api/inventory', {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newRow)
+      })
+
+      const updatedRow = {
+        ...newRow,
+        isNew: false
+      };
+
+      setItems(prev =>
+        prev.map(row =>
+          row.id === newRow.id
+            ? updatedRow
+            : row
+        )
+      );
+
+      return updatedRow;
+    }
+
+    fetch('http://127.0.0.1:8080/api/inventory', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(newRow)
+    })
 
     const updatedRow = {
       ...newRow,
@@ -168,18 +206,27 @@ function Inventory() {
         label: `${u.firstname} ${u.lastname}`
       })),
       valueFormatter: (params) => {
-          if (!params) return "";
+              // 1. Initialisierung: Wir schauen erst mal, was wir überhaupt haben
+        let val = params?.value !== undefined ? params.value : params;
 
-          // Falls es ein Objekt ist, nimm die Felder daraus
-          if (typeof params === 'object') {
-              return `${params.firstname} ${params.lastname}`;
-          }
-          const user = params.value;
+        // 2. Sicherheits-Check: Wenn gar nichts da ist
+        if (val === null || val === undefined) return "";
 
+        // 3. Fall: Es ist das fertige User-Objekt (z.B. vom PHP-Join)
+        if (typeof val === 'object' && val.firstname) {
+            return `${val.firstname} ${val.lastname}`;
+        }
 
-          // Falls es doch mal nur eine ID sein sollte (Fallback)
-          const foundUser = users.find(u => u.id == user);
-          return foundUser ? `${foundUser.firstname} ${foundUser.lastname}` : "";
+        // 4. Fall: Es ist nur eine ID (z.B. nach dem Editieren oder direkt übergeben)
+        // Wir suchen in der users-Liste (die du oben per useState hast)
+        const foundUser = users.find(u => u.id == val);
+
+        if (foundUser) {
+            return `${foundUser.firstname} ${foundUser.lastname}`;
+        }
+
+        // Fallback: Wenn wir gar nichts finden, gib den Rohwert zurück (oder leer)
+        return val;
       }
     },
 
@@ -200,7 +247,7 @@ function Inventory() {
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Speichern"
-              onClick={() => handleSaveClick(params.id)}
+              onClick={() => handleSaveClick(params)}
             />,
 
             <GridActionsCellItem

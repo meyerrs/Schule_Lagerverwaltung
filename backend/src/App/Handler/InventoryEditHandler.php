@@ -5,6 +5,8 @@ namespace App\Handler;
 use App\Entity\Inventory;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Laminas\Diactoros\Response\JsonResponse;
+use Psalm\Report\JsonReport;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,12 +41,12 @@ class InventoryEditHandler implements RequestHandlerInterface
         $item->setFach($requestBody['fach'] ?? $item->getFach());
         $item->setOrt($requestBody['ort'] ?? $item->getOrt());
 
-        if (!is_int($requestBody['verantwortlicherId'])) {
+        if (!is_int($requestBody['verantwortlicher'])) {
             $this->entityManager->flush();
             return $this->responseFactory->createResponse(200);
         }
 
-        $user = $this->entityManager->find(User::class, $requestBody['verantwortlicherId']);
+        $user = $this->entityManager->find(User::class, $requestBody['verantwortlicher']);
 
         if (!$user instanceof User) {
             return $this->responseFactory->createResponse(500);
