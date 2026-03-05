@@ -51,4 +51,5 @@ return static function (Application $app, MiddlewareFactory $factory, ContainerI
     $app->delete('/api/inventory', App\Handler\InventoryDeleteHandler::class, 'api.inventoryDelete');
     $app->put('/api/inventory', App\Handler\InventoryEditHandler::class, 'api.inventoryEdit');
     $app->put('/api/user', App\Handler\UserEditHandler::class,'api.userEdit');
+    $app->get('/api/user', App\Handler\UserFetchHandler::class, 'api.userFetch');
 };

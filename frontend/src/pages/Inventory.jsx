@@ -34,7 +34,7 @@ function Inventory() {
       .then(data => {
           setItems(data);
       })
-    fetch('http://127.0.0.1:8080/api/inventory', {
+    fetch('http://127.0.0.1:8080/api/user', {
       method: "GET",
       credentials: "include",
     })
@@ -163,11 +163,23 @@ function Inventory() {
       flex: 1,
       editable: true,
       type: "singleSelect",
-      valueOptions: users,
+      valueOptions: users.map(u => ({
+        value: u.id,
+        label: `${u.firstname} ${u.lastname}`
+      })),
       valueFormatter: (params) => {
-        console.log('params: ', params);
-        const user = users.find(u => u.id === params.verantwortlicher.id);
-        return user ? (user.firstname . user.lastname) : "";
+          if (!params) return "";
+
+          // Falls es ein Objekt ist, nimm die Felder daraus
+          if (typeof params === 'object') {
+              return `${params.firstname} ${params.lastname}`;
+          }
+          const user = params.value;
+
+
+          // Falls es doch mal nur eine ID sein sollte (Fallback)
+          const foundUser = users.find(u => u.id == user);
+          return foundUser ? `${foundUser.firstname} ${foundUser.lastname}` : "";
       }
     },
 

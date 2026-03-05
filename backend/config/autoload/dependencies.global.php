@@ -8,6 +8,7 @@ use App\Handler\InventoryEditHandler;
 use App\Handler\InventoryFetchHandler;
 use App\Handler\LoginHandler;
 use App\Handler\LogoutHandler;
+use App\Handler\UserFetchHandler;
 use App\Middleware\AuthenticationMiddleware;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,6 +55,12 @@ return [
             },
             App\Handler\InventoryEditHandler::class => function(ContainerInterface $container) {
                 return new InventoryEditHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
+            App\Handler\UserFetchHandler::class => function(ContainerInterface $container) {
+                return new UserFetchHandler(
                     $container->get(ResponseFactoryInterface::class),
                     $container->get(EntityManagerInterface::class)
                 );
