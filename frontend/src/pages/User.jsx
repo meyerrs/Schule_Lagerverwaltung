@@ -53,6 +53,7 @@ function User() {
         lastname : "",
         username : "",
         password : "",
+        isNew: true
       }
     ]);
 
@@ -105,6 +106,36 @@ function User() {
 
 
   const processRowUpdate = (newRow) => {
+if (!newRow.isNew) {
+      fetch('http://127.0.0.1:8080/api/user', {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newRow)
+      })
+
+      const updatedRow = {
+        ...newRow,
+        isNew: false
+      };
+
+      setItems(prev =>
+        prev.map(row =>
+          row.id === newRow.id
+            ? updatedRow
+            : row
+        )
+      );
+
+      return updatedRow;
+    }
+
+    fetch('http://127.0.0.1:8080/api/user', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(newRow)
+    })
 
     const updatedRow = {
       ...newRow,
@@ -124,8 +155,6 @@ function User() {
 
  
   const columns = [
-
-    { field: "id", headerName: "ID", width: 90 },
 
     { field: "firstname", headerName: "Firstname", flex: 1, editable: true },
 

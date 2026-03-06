@@ -51,4 +51,6 @@ return static function (Application $app, MiddlewareFactory $factory, ContainerI
     $app->put('/api/user', App\Handler\UserEditHandler::class,'api.userEdit');
     $app->get('/api/user', App\Handler\UserFetchHandler::class, 'api.userFetch');
     $app->post('/api/inventory', App\Handler\InventoryCreateHandler::class, 'api.inventoryCreate');
+    $app->post('/api/user', App\Handler\UserCreateHandler::class, 'api.userCreate');
+    $app->get('/api/status', App\Handler\StatusFetchHandler::class, 'api.statusFetch');
 };

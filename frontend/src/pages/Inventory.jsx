@@ -22,6 +22,7 @@ function Inventory() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
+  const [status, setStatus] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
 
 
@@ -41,6 +42,14 @@ function Inventory() {
       .then(response => response.json()) // Extrahiert den Body
       .then(data => {
           setUsers(data);
+      })
+    fetch('http://127.0.0.1:8080/api/status', {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(response => response.json()) // Extrahiert den Body
+      .then(data => {
+          setStatus(data);
       })
     // setItems([
     //   {
@@ -131,8 +140,6 @@ function Inventory() {
 
 
   const processRowUpdate = (newRow) => {
-    console.log('Reihen Änderung: ', newRow);
-
     if (!newRow.isNew) {
       fetch('http://127.0.0.1:8080/api/inventory', {
         method: "PUT",
@@ -183,8 +190,6 @@ function Inventory() {
  
   const columns = [
 
-    { field: "inventarID", headerName: "ID", width: 90 },
-
     { field: "name", headerName: "Name", flex: 1, editable: true },
 
     { field: "abteilung", headerName: "Abteilung", flex: 1, editable: true },
@@ -223,6 +228,41 @@ function Inventory() {
 
         if (foundUser) {
             return `${foundUser.firstname} ${foundUser.lastname}`;
+        }
+
+        // Fallback: Wenn wir gar nichts finden, gib den Rohwert zurück (oder leer)
+        return val;
+      }
+    },
+
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      editable: true,
+      type: "singleSelect",
+      valueOptions: status.map(s => ({
+        value: s.id,
+        label: s.name,
+      })),
+      valueFormatter: (params) => {
+              // 1. Initialisierung: Wir schauen erst mal, was wir überhaupt haben
+        let val = params?.value !== undefined ? params.value : params;
+
+        // 2. Sicherheits-Check: Wenn gar nichts da ist
+        if (val === null || val === undefined) return "";
+
+        // 3. Fall: Es ist das fertige User-Objekt (z.B. vom PHP-Join)
+        if (typeof val === 'object' && val.name) {
+            return val.name;
+        }
+
+        // 4. Fall: Es ist nur eine ID (z.B. nach dem Editieren oder direkt übergeben)
+        // Wir suchen in der users-Liste (die du oben per useState hast)
+        const foundStatus = status.find(s => s.id == val);
+
+        if (foundStatus) {
+            return foundStatus.name;
         }
 
         // Fallback: Wenn wir gar nichts finden, gib den Rohwert zurück (oder leer)

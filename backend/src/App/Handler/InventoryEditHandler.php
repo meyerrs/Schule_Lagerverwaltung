@@ -3,10 +3,9 @@
 namespace App\Handler;
 
 use App\Entity\Inventory;
+use App\Entity\Status;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Laminas\Diactoros\Response\JsonResponse;
-use Psalm\Report\JsonReport;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,18 +40,26 @@ class InventoryEditHandler implements RequestHandlerInterface
         $item->setFach($requestBody['fach'] ?? $item->getFach());
         $item->setOrt($requestBody['ort'] ?? $item->getOrt());
 
-        if (!is_int($requestBody['verantwortlicher'])) {
-            $this->entityManager->flush();
-            return $this->responseFactory->createResponse(200);
+        if (is_int($requestBody['verantwortlicher'])) {
+            $user = $this->entityManager->find(User::class, $requestBody['verantwortlicher']);
+
+            if (!$user instanceof User) {
+                return $this->responseFactory->createResponse(500);
+            }
+
+            $item->setVerantwortlicher($user);
         }
 
-        $user = $this->entityManager->find(User::class, $requestBody['verantwortlicher']);
+        if (is_int($requestBody['status'])) {
+            $status = $this->entityManager->find(Status::class, $requestBody['status']);
 
-        if (!$user instanceof User) {
-            return $this->responseFactory->createResponse(500);
+            if (!$status instanceof Status) {
+                return $this->responseFactory->createResponse(500);
+            }
+            $item->setStatus($status);
         }
 
-        $item->setVerantwortlicher($user);
+        $this->entityManager->persist($item);
         $this->entityManager->flush();
         
         return $this->responseFactory->createResponse(200);

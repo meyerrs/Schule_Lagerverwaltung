@@ -2,7 +2,7 @@
 
 namespace App\Handler;
 
-use App\Entity\User;
+use App\Entity\Status;
 use Doctrine\ORM\EntityManagerInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class UserFetchHandler implements RequestHandlerInterface
+class StatusFetchHandler implements RequestHandlerInterface
 {
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
@@ -23,23 +23,24 @@ class UserFetchHandler implements RequestHandlerInterface
         $params = $request->getQueryParams();
 
         if (!isset($params['id'])) {
-            $users = $this->entityManager->createQueryBuilder()
-                ->select('u')
-                ->from(User::class, 'u')
+            $status = $this->entityManager->createQueryBuilder()
+                ->select('s')
+                ->from(Status::class, 's')
                 ->getQuery()
                 ->getArrayResult();
 
-            return new JsonResponse($users);
+            return new JsonResponse($status);
         }
+
         $id = $params['id'];
-        $user = $this->entityManager->createQueryBuilder()
-            ->select('u')
-            ->where('u.id = :id')
+        $status = $this->entityManager->createQueryBuilder()
+            ->select('s')
+            ->where('s.id = :id')
             ->setParameter('id', $id)
-            ->from(User::class, 'u')
+            ->from(Status::class, 's')
             ->getQuery()
             ->getArrayResult();
 
-        return new JsonResponse($user);
+        return new JsonResponse($status);
     }
 }

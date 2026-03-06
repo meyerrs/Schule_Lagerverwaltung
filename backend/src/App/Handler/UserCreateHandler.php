@@ -2,15 +2,16 @@
 
 namespace App\Handler;
 
-use App\Entity\Inventory;
+use App\Entity\Role;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class InventoryCreateHandler implements RequestHandlerInterface
+class UserCreateHandler implements RequestHandlerInterface
 {
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
@@ -23,30 +24,28 @@ class InventoryCreateHandler implements RequestHandlerInterface
         $json = $request->getBody()->getContents();
         $requestBody = json_decode($json, true);
 
-        $item = new Inventory();
+        $user = new User();
 
-        $item->setName($requestBody['name']);
-        $item->setAbteilung($requestBody['abteilung']);
-        $item->setGruppe($requestBody['gruppe']);
-        $item->setFach($requestBody['fach']);
-        $item->setOrt($requestBody['ort']);
-        
-        if (!is_int($requestBody['verantwortlicher'])) {
-            $this->entityManager->persist($item);
+        $user->setFirstname($requestBody['firstname'] ?? null);
+        $user->setLastname($requestBody['lastname'] ?? null);
+        $user->setUsername($requestBody['username'] ?? null);
+        $user->setPassword($requestBody['password'] ?? null);
+
+        if (!is_array($requestBody['roles'] ?? null)) {
+            $this->entityManager->persist($user);
             $this->entityManager->flush();
             return $this->responseFactory->createResponse(200);
         }
 
-        $user = $this->entityManager->find(User::class, $requestBody['verantwortlicher']);
+        $roles = $requestBody['roles'];
+        foreach($roles as $role) {
+            $role = $this->entityManager->find(Role::class, $role['id']);
 
-        if (!$user instanceof User) {
-            return $this->responseFactory->createResponse(500);
+            $user->addRole($role);
         }
-
-        $item->setVerantwortlicher($user);
-        $this->entityManager->persist($item);
+        
+        $this->entityManager->persist($user);
         $this->entityManager->flush();
-
         return $this->responseFactory->createResponse(200);
     }
 }
