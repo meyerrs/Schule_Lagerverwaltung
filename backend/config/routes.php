@@ -3,9 +3,7 @@
 declare(strict_types=1);
 
 use App\Handler\HomePageHandler;
-use App\Handler\LoginHandler;
 use App\Handler\PingHandler;
-use App\Handler\UserEditHandler;
 use Mezzio\Application;
 use Mezzio\MiddlewareFactory;
 use Psr\Container\ContainerInterface;
@@ -52,4 +50,5 @@ return static function (Application $app, MiddlewareFactory $factory, ContainerI
     $app->put('/api/inventory', App\Handler\InventoryEditHandler::class, 'api.inventoryEdit');
     $app->put('/api/user', App\Handler\UserEditHandler::class,'api.userEdit');
     $app->get('/api/user', App\Handler\UserFetchHandler::class, 'api.userFetch');
+    $app->post('/api/inventory', App\Handler\InventoryCreateHandler::class, 'api.inventoryCreate');
 };
