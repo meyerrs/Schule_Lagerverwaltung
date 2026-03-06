@@ -3,11 +3,14 @@
 declare(strict_types=1);
 
 use App\Handler\AuthenticationHandler;
+use App\Handler\InventoryCreateHandler;
 use App\Handler\InventoryDeleteHandler;
 use App\Handler\InventoryEditHandler;
 use App\Handler\InventoryFetchHandler;
 use App\Handler\LoginHandler;
 use App\Handler\LogoutHandler;
+use App\Handler\UserEditHandler;
+use App\Handler\UserFetchHandler;
 use App\Middleware\AuthenticationMiddleware;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,6 +57,24 @@ return [
             },
             App\Handler\InventoryEditHandler::class => function(ContainerInterface $container) {
                 return new InventoryEditHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
+            App\Handler\UserFetchHandler::class => function(ContainerInterface $container) {
+                return new UserFetchHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
+            App\Handler\UserEditHandler::class => function(ContainerInterface $container) {
+                return new UserEditHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
+            App\Handler\InventoryCreateHandler::class => function(ContainerInterface $container) {
+                return new InventoryCreateHandler(
                     $container->get(ResponseFactoryInterface::class),
                     $container->get(EntityManagerInterface::class)
                 );

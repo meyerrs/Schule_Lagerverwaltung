@@ -17,33 +17,42 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 
-
-const users = [
-  { value: "max", label: "Max Mustermann" },
-  { value: "anna", label: "Anna Schmidt" },
-  { value: "tom", label: "Tom Müller" }
-];
-
 function Inventory() {
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [users, setUsers] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
 
 
   useEffect(() => {
-    setItems([
-      {
-        inventarID: 1,
-        name: "Laptop Dell XPS",
-        abteilung: "IT",
-        gruppe: "Hardware",
-        fach: "A1",
-        ort: "Büro 101",
-        verantwortlicher: "max"
-      }
-    ]);
+    fetch('http://127.0.0.1:8080/api/inventory', {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(response => response.json()) // Extrahiert den Body
+      .then(data => {
+          setItems(data);
+      })
+    fetch('http://127.0.0.1:8080/api/user', {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(response => response.json()) // Extrahiert den Body
+      .then(data => {
+          setUsers(data);
+      })
+    // setItems([
+    //   {
+    //     inventarID: 1,
+    //     name: "Laptop Dell XPS",
+    //     abteilung: "IT",
+    //     gruppe: "Hardware",
+    //     fach: "A1",
+    //     ort: "Büro 101",
+    //     verantwortlicher: "max"
+    //   }
+    // ]);
 
     setLoading(false);
   }, []);
@@ -55,7 +64,7 @@ function Inventory() {
     setItems(prev => [
       ...prev,
       {
-        inventarID: id,
+        id: id,
         name: "",
         abteilung: "",
         gruppe: "",
@@ -81,20 +90,20 @@ function Inventory() {
   };
 
  
-  const handleSaveClick = (id) => {
+  const handleSaveClick = (params) => {
     setRowModesModel(prev => ({
       ...prev,
-      [id]: { mode: GridRowModes.View }
+      [params.id]: { mode: GridRowModes.View }
     }));
   };
 
   // ❌ Abbrechen
   const handleCancelClick = (id) => {
 
-    const row = items.find(r => r.inventarID === id);
+    const row = items.find(r => r.id === id);
 
     if (row?.isNew) {
-      setItems(prev => prev.filter(r => r.inventarID !== id));
+      setItems(prev => prev.filter(r => r.id !== id));
     }
 
     setRowModesModel(prev => ({
@@ -110,11 +119,50 @@ function Inventory() {
   const handleDeleteClick = (id) => {
     if (!window.confirm("Wirklich löschen?")) return;
 
-    setItems(prev => prev.filter(row => row.inventarID !== id));
+    fetch('http://127.0.0.1:8080/api/inventory', {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ "id": id })
+    })
+
+    setItems(prev => prev.filter(row => row.id !== id));
   };
 
 
   const processRowUpdate = (newRow) => {
+    console.log('Reihen Änderung: ', newRow);
+
+    if (!newRow.isNew) {
+      fetch('http://127.0.0.1:8080/api/inventory', {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newRow)
+      })
+
+      const updatedRow = {
+        ...newRow,
+        isNew: false
+      };
+
+      setItems(prev =>
+        prev.map(row =>
+          row.id === newRow.id
+            ? updatedRow
+            : row
+        )
+      );
+
+      return updatedRow;
+    }
+
+    fetch('http://127.0.0.1:8080/api/inventory', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(newRow)
+    })
 
     const updatedRow = {
       ...newRow,
@@ -123,7 +171,7 @@ function Inventory() {
 
     setItems(prev =>
       prev.map(row =>
-        row.inventarID === newRow.inventarID
+        row.id === newRow.id
           ? updatedRow
           : row
       )
@@ -153,10 +201,32 @@ function Inventory() {
       flex: 1,
       editable: true,
       type: "singleSelect",
-      valueOptions: users,
+      valueOptions: users.map(u => ({
+        value: u.id,
+        label: `${u.firstname} ${u.lastname}`
+      })),
       valueFormatter: (params) => {
-        const user = users.find(u => u.value === params.value);
-        return user ? user.label : "";
+              // 1. Initialisierung: Wir schauen erst mal, was wir überhaupt haben
+        let val = params?.value !== undefined ? params.value : params;
+
+        // 2. Sicherheits-Check: Wenn gar nichts da ist
+        if (val === null || val === undefined) return "";
+
+        // 3. Fall: Es ist das fertige User-Objekt (z.B. vom PHP-Join)
+        if (typeof val === 'object' && val.firstname) {
+            return `${val.firstname} ${val.lastname}`;
+        }
+
+        // 4. Fall: Es ist nur eine ID (z.B. nach dem Editieren oder direkt übergeben)
+        // Wir suchen in der users-Liste (die du oben per useState hast)
+        const foundUser = users.find(u => u.id == val);
+
+        if (foundUser) {
+            return `${foundUser.firstname} ${foundUser.lastname}`;
+        }
+
+        // Fallback: Wenn wir gar nichts finden, gib den Rohwert zurück (oder leer)
+        return val;
       }
     },
 
@@ -177,7 +247,7 @@ function Inventory() {
             <GridActionsCellItem
               icon={<SaveIcon />}
               label="Speichern"
-              onClick={() => handleSaveClick(params.id)}
+              onClick={() => handleSaveClick(params)}
             />,
 
             <GridActionsCellItem
@@ -221,7 +291,7 @@ function Inventory() {
           rows={items}
           columns={columns}
           loading={loading}
-          getRowId={(row) => row.inventarID}
+          getRowId={(row) => row.id}
           editMode="row"
           rowModesModel={rowModesModel}
           onRowModesModelChange={setRowModesModel}

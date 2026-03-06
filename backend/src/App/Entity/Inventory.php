@@ -11,29 +11,32 @@ use Doctrine\ORM\Mapping as ORM;
 class Inventory
 {
     #[ORM\Id]
-    #[ORM\Column(type: Types:: INTEGER)]
+    #[ORM\Column(type: Types::INTEGER)]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private int $id;
 
-    #[ORM\Column(type: Types:: STRING)]
+    #[ORM\Column(type: Types::STRING)]
     private string $name;
 
-    #[ORM\Column(type: Types:: STRING)]
+    #[ORM\Column(type: Types::STRING)]
     private string $abteilung;  
 
-    #[ORM\Column(type: Types:: STRING)]
+    #[ORM\Column(type: Types::STRING)]
     private string $gruppe;
 
-    #[ORM\Column(type: Types:: STRING)]
+    #[ORM\Column(type: Types::STRING)]
     private string $fach;
 
-    #[ORM\Column(type: Types:: STRING)]
+    #[ORM\Column(type: Types::STRING)]
     private string $ort;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'verantwortlicher_id', referencedColumnName: 'id', nullable: true)]
     private User $verantwortlicher;
 
+    #[ORM\ManyToOne(targetEntity: Status::class)]
+    #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id', nullable: true)]
+    private Status $status;
 
     public function getID() : int
     {
@@ -98,5 +101,17 @@ class Inventory
     public function setVerantwortlicher(User $verantwortlicher): User
     {
        return $this->verantwortlicher = $verantwortlicher;
+    }
+
+    public function getStatus(): Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(Status $status): self
+    {
+        $this->status = $status;
+
+        return $this;
     }
 }

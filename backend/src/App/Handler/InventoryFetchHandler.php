@@ -26,8 +26,9 @@ class InventoryFetchHandler implements RequestHandlerInterface
             !isset($params['id'])
         ) {
             $inventory = $this->entityManager->createQueryBuilder()
-                ->select('i')
+                ->select('i', 'partial v.{id, firstname, lastname}')
                 ->from(\App\Entity\Inventory::class, 'i')
+                ->leftJoin('i.verantwortlicher', 'v')
                 ->getQuery()
                 ->getArrayResult();
             return new JsonResponse($inventory);

@@ -5,14 +5,12 @@ namespace App\Handler;
 use App\Entity\Inventory;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Laminas\Diactoros\Response\JsonResponse;
-use Psalm\Report\JsonReport;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class InventoryEditHandler implements RequestHandlerInterface
+class InventoryCreateHandler implements RequestHandlerInterface
 {
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
@@ -25,22 +23,14 @@ class InventoryEditHandler implements RequestHandlerInterface
         $json = $request->getBody()->getContents();
         $requestBody = json_decode($json, true);
 
-        if (!is_int($requestBody['id'])) {
-            $this->responseFactory->createResponse(400);
-        }
+        $item = new Inventory();
 
-        $item = $this->entityManager->find(Inventory::class, $requestBody['id']);
-
-        if (!$item instanceof Inventory) {
-            return $this->responseFactory->createResponse(500);
-        }
-
-        $item->setName($requestBody['name'] ?? $item->getName());
-        $item->setAbteilung($requestBody['abteilung'] ?? $item->getAbteilung());
-        $item->setGruppe($requestBody['gruppe'] ?? $item->getGruppe());
-        $item->setFach($requestBody['fach'] ?? $item->getFach());
-        $item->setOrt($requestBody['ort'] ?? $item->getOrt());
-
+        $item->setName($requestBody['name']);
+        $item->setAbteilung($requestBody['abteilung']);
+        $item->setGruppe($requestBody['gruppe']);
+        $item->setFach($requestBody['fach']);
+        $item->setOrt($requestBody['ort']);
+        
         if (!is_int($requestBody['verantwortlicher'])) {
             $this->entityManager->flush();
             return $this->responseFactory->createResponse(200);
@@ -53,8 +43,7 @@ class InventoryEditHandler implements RequestHandlerInterface
         }
 
         $item->setVerantwortlicher($user);
+        $this->entityManager->persist($item);
         $this->entityManager->flush();
-        
-        return $this->responseFactory->createResponse(200);
     }
 }
