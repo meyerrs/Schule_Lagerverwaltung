@@ -36,6 +36,8 @@ function App() {
     }).then(() => setLoggedIn(false));
   };
 
+  console.log("roles: ", roles);
+
   return (
     <>
       {loggedIn && (

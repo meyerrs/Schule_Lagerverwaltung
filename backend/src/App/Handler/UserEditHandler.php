@@ -2,7 +2,7 @@
 
 namespace App\Handler;
 
-
+use App\Entity\Role;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -38,6 +38,12 @@ class UserEditHandler implements RequestHandlerInterface
         $item->setUsername($requestBody['username'] ?? $item->getUsername());
         $item->setPassword($requestBody['password'] ?? $item->getPassword());
 
+        $roles = $requestBody['roles'];
+        foreach($roles as $role) {
+            $role = $this->entityManager->find(Role::class, $role['id']);
+
+            $item->addRole($role);
+        }
 
         $this->entityManager->flush();
         

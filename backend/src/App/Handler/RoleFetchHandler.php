@@ -2,7 +2,7 @@
 
 namespace App\Handler;
 
-use App\Entity\User;
+use App\Entity\Role;
 use Doctrine\ORM\EntityManagerInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class UserFetchHandler implements RequestHandlerInterface
+class RoleFetchHandler implements RequestHandlerInterface
 {
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
@@ -23,25 +23,23 @@ class UserFetchHandler implements RequestHandlerInterface
         $params = $request->getQueryParams();
 
         if (!isset($params['id'])) {
-            $users = $this->entityManager->createQueryBuilder()
-                ->select('u', 'r')
-                ->from(User::class, 'u')
-                ->leftJoin('u.roles', 'r')
+            $roles = $this->entityManager->createQueryBuilder()
+                ->select('r')
+                ->from(Role::class, 'r')
                 ->getQuery()
                 ->getArrayResult();
 
-            return new JsonResponse($users);
+            return new JsonResponse($roles);
         }
-        $id = $params['id'];
-        $user = $this->entityManager->createQueryBuilder()
-            ->select('u', 'r')
-            ->where('u.id = :id')
-            ->setParameter('id', $id)
-            ->from(User::class, 'u')
-            ->leftJoin('u.roles', 'r')
-            ->getQuery()
-            ->getArrayResult();
 
-        return new JsonResponse($user);
+        $roles = $this->entityManager->createQueryBuilder()
+                ->select('r')
+                ->from(Role::class, 'r')
+                ->where('r.id = :id')
+                ->setParameter('id', $params['id'])
+                ->getQuery()
+                ->getArrayResult();
+
+        return new JsonResponse($roles);
     }
 }

@@ -9,6 +9,7 @@ use App\Handler\InventoryEditHandler;
 use App\Handler\InventoryFetchHandler;
 use App\Handler\LoginHandler;
 use App\Handler\LogoutHandler;
+use App\Handler\RoleFetchHandler;
 use App\Handler\StatusFetchHandler;
 use App\Handler\UserCreateHandler;
 use App\Handler\UserDeleteHandler;
@@ -96,6 +97,12 @@ return [
             },
             App\Handler\UserDeleteHandler::class => function(ContainerInterface $container) {
                 return new UserDeleteHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
+            App\Handler\RoleFetchHandler::class => function(ContainerInterface $container) {
+                return new RoleFetchHandler(
                     $container->get(ResponseFactoryInterface::class),
                     $container->get(EntityManagerInterface::class)
                 );

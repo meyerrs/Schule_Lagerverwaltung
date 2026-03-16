@@ -9,7 +9,12 @@ import {
 import {
   Typography,
   Button,
-  Box
+  Box,
+  Select,
+  OutlinedInput,
+  MenuItem,
+  Checkbox,
+  ListItemText
 } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -21,8 +26,8 @@ import CloseIcon from "@mui/icons-material/Close";
 function User() {
 
   const [items, setItems] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [users, setUsers] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
 
 
@@ -34,6 +39,15 @@ function User() {
       .then(response => response.json()) // Extrahiert den Body
       .then(data => {
           setItems(data);
+      })
+
+    fetch('http://127.0.0.1:8080/api/role', {
+      method: "GET",
+      credentials: "include",
+    })
+      .then(response => response.json()) // Extrahiert den Body
+      .then(data => {
+          setRoles(data);
       })
     
    
@@ -170,6 +184,60 @@ if (!newRow.isNew) {
     { field: "username", headerName: "Username", flex: 1, editable: true },
 
     { field: "password", headerName: "Password", flex: 1, editable: true },
+
+    {
+      field: "roles",
+      headerName: "Rollen",
+      flex: 1,
+      editable: true,
+
+      valueFormatter: (params) => {
+        if (!params || !Array.isArray(params)) return "";
+        
+        // Extrahiert den 'name' aus jedem Objekt und trennt sie mit Komma
+        return params.map(obj => obj.name).join(", ");
+      },
+
+      renderEditCell: (params) => {
+        // 1. Daten aus params extrahieren
+        const { id, field, value, api } = params;
+
+        // 2. Anzeige-Logik (Array von Objekten -> Array von Strings)
+        const selectedNames = Array.isArray(value) 
+          ? value.map((role) => role.name) 
+          : [];
+
+        const handleChange = (event) => {
+          const newNames = event.target.value;
+
+          // 3. Zurückwandeln in die Objekt-Struktur deiner Daten
+          const updatedRoles = newNames.map(name => 
+            roles.find(r => r.name === name)
+          );
+
+          // 4. Den Wert im Grid aktualisieren (Free-Version Syntax)
+          api.setEditCellValue({ id, field, value: updatedRoles });
+        };
+
+        return (
+          <Select
+            multiple
+            value={selectedNames}
+            onChange={handleChange}
+            fullWidth
+            size="small"
+            // Wichtig: Verhindert, dass das Grid die Zelle schließt, wenn man klickt
+            onMouseDown={(e) => e.stopPropagation()} 
+          >
+            {roles.map((role) => (
+              <MenuItem key={role.id} value={role.name}>
+                {role.name}
+              </MenuItem>
+            ))}
+          </Select>
+        );
+      }
+    },
 
 
     {

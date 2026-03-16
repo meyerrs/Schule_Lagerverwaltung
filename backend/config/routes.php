@@ -54,4 +54,5 @@ return static function (Application $app, MiddlewareFactory $factory, ContainerI
     $app->post('/api/user', App\Handler\UserCreateHandler::class, 'api.userCreate');
     $app->get('/api/status', App\Handler\StatusFetchHandler::class, 'api.statusFetch');
     $app->delete('/api/user', App\Handler\UserDeleteHandler::class, 'api.userDelete');
+    $app->get('/api/role', App\Handler\RoleFetchHandler::class, 'api.roleFetch');
 };
