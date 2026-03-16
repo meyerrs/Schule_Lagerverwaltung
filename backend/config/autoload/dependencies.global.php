@@ -11,6 +11,7 @@ use App\Handler\LoginHandler;
 use App\Handler\LogoutHandler;
 use App\Handler\StatusFetchHandler;
 use App\Handler\UserCreateHandler;
+use App\Handler\UserDeleteHandler;
 use App\Handler\UserEditHandler;
 use App\Handler\UserFetchHandler;
 use App\Middleware\AuthenticationMiddleware;
@@ -89,6 +90,12 @@ return [
             },
             App\Handler\StatusFetchHandler::class => function(ContainerInterface $container) {
                 return new StatusFetchHandler(
+                    $container->get(ResponseFactoryInterface::class),
+                    $container->get(EntityManagerInterface::class)
+                );
+            },
+            App\Handler\UserDeleteHandler::class => function(ContainerInterface $container) {
+                return new UserDeleteHandler(
                     $container->get(ResponseFactoryInterface::class),
                     $container->get(EntityManagerInterface::class)
                 );

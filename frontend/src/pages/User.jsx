@@ -101,6 +101,13 @@ function User() {
   const handleDeleteClick = (id) => {
     if (!window.confirm("Wirklich löschen?")) return;
 
+    fetch('http://127.0.0.1:8080/api/user', {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ "id": id })
+    })
+
     setItems(prev => prev.filter(row => row.id !== id));
   };
 
