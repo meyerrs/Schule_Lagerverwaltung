@@ -4,6 +4,7 @@ namespace App\Handler;
 
 use App\Entity\Inventory;
 use Doctrine\ORM\EntityManagerInterface;
+use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,6 +20,11 @@ class InventoryDeleteHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $session = $request->getAttribute(SessionInterface::class);
+        $roles = $session->get('roles');
+        if (!is_array($roles) || (!in_array('admin', $roles) && !in_array('inventarAdmin', $roles))) {
+            return $this->responseFactory->createResponse(500);
+        }
         $json = $request->getBody()->getContents();
         $body = json_decode($json, true);
 

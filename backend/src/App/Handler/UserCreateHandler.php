@@ -6,6 +6,7 @@ use App\Entity\Role;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Laminas\Diactoros\Response\JsonResponse;
+use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,6 +22,11 @@ class UserCreateHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $session = $request->getAttribute(SessionInterface::class);
+        $roles = $session->get('roles');
+        if (!is_array($roles) || !in_array('admin', $roles)) {
+            return $this->responseFactory->createResponse(500);
+        }
         $json = $request->getBody()->getContents();
         $requestBody = json_decode($json, true);
 

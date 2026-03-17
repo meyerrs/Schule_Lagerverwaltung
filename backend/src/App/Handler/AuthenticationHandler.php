@@ -30,14 +30,14 @@ class AuthenticationHandler implements RequestHandlerInterface
         $id = $session->get('user_id');
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['id' => $id]);
 
-        $roleIds = [];
+        $roleNames = [];
         foreach ($user->getRoles() as $role) {
-            $roleIds[] = $role->getId();
+            $roleNames[] = $role->getName();
         }
 
         return (new JsonResponse([
             'username' => $user->getUsername(),
-            'roles' => $roleIds,
+            'roles' => $roleNames,
         ]))
             ->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
             ->withHeader('Pragma', 'no-cache')

@@ -17,14 +17,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 
-function Inventory() {
-
+function Inventory(props) {
+  const {isAdmin, isInventoryAdmin} = props;
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [status, setStatus] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
-
 
   useEffect(() => {
     fetch('http://127.0.0.1:8080/api/inventory', {
@@ -190,21 +189,21 @@ function Inventory() {
  
   const columns = [
 
-    { field: "name", headerName: "Name", flex: 1, editable: true },
+    { field: "name", headerName: "Name", flex: 1, editable: isAdmin || isInventoryAdmin },
 
-    { field: "abteilung", headerName: "Abteilung", flex: 1, editable: true },
+    { field: "abteilung", headerName: "Abteilung", flex: 1, editable: isAdmin || isInventoryAdmin },
 
-    { field: "gruppe", headerName: "Gruppe", flex: 1, editable: true },
+    { field: "gruppe", headerName: "Gruppe", flex: 1, editable: isAdmin || isInventoryAdmin },
 
-    { field: "fach", headerName: "Fach", flex: 1, editable: true },
+    { field: "fach", headerName: "Fach", flex: 1, editable: isAdmin || isInventoryAdmin },
 
-    { field: "ort", headerName: "Ort", flex: 1, editable: true },
+    { field: "ort", headerName: "Ort", flex: 1, editable: isAdmin || isInventoryAdmin },
 
     {
       field: "verantwortlicher",
       headerName: "Verantwortlicher",
       flex: 1,
-      editable: true,
+      editable: isAdmin || isInventoryAdmin,
       type: "singleSelect",
       valueOptions: users.map(u => ({
         value: u.id,
@@ -239,7 +238,7 @@ function Inventory() {
       field: "status",
       headerName: "Status",
       flex: 1,
-      editable: true,
+      editable: isAdmin || isInventoryAdmin,
       type: "singleSelect",
       valueOptions: status.map(s => ({
         value: s.id,
@@ -270,7 +269,7 @@ function Inventory() {
       }
     },
 
-    {
+    (isAdmin || isInventoryAdmin) && {
       field: "actions",
       type: "actions",
       headerName: "Aktionen",
@@ -300,7 +299,6 @@ function Inventory() {
         }
 
         return [
-
           <GridActionsCellItem
             icon={<EditIcon />}
             label="Bearbeiten"
@@ -353,16 +351,18 @@ function Inventory() {
           }}
         />
       </div>
-
-      <Box sx={{ mt: 2 }}>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddClick}
-        >
-          Hinzufügen
-        </Button>
-      </Box>
+      
+      {isAdmin || isInventoryAdmin && (
+        <Box sx={{ mt: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddClick}
+          >
+            Hinzufügen
+          </Button>
+        </Box>
+      )}
 
     </div>
   );
