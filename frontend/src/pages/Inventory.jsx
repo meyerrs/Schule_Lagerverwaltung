@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   DataGrid,
   GridActionsCellItem,
-  GridRowModes
+  GridRowModes,
+  GridToolbarContainer, // Der Rahmen
+  GridToolbarExport,    // Nur der Export-Button
+  GridToolbarQuickFilter // Das Suchfeld (optional)
 } from "@mui/x-data-grid";
 
 import {
@@ -64,6 +67,60 @@ function Inventory(props) {
 
     setLoading(false);
   }, []);
+
+  const exportToCSV = (itemsToExport, columnsToExport, usersList, statusList) => {
+    if (!itemsToExport || itemsToExport.length === 0) {
+      alert("Keine Daten zum Exportieren vorhanden.");
+      return;
+    }
+
+    // 1. Nur Spalten nehmen, die ein 'field' haben und nicht 'actions' sind
+    const validCols = columnsToExport.filter(col => col && col.field && col.field !== 'actions');
+    
+    // 2. Header Zeile
+    const header = validCols.map(col => `"${col.headerName || col.field}"`).join(';');
+
+    // 3. Daten Zeilen
+    const rows = itemsToExport.map(item => {
+      return validCols.map(col => {
+        let value = item[col.field];
+
+        // Falls der Wert ein Objekt ist (manchmal liefert API Objekte statt IDs)
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+           if (col.field === 'verantwortlicher') value = value.id || value;
+           if (col.field === 'status') value = value.id || value;
+        }
+
+        // Mapping für Verantwortlicher
+        if (col.field === 'verantwortlicher') {
+          const u = usersList.find(user => String(user.id) === String(value));
+          value = u ? `${u.firstname} ${u.lastname}` : value;
+        }
+
+        // Mapping für Status
+        if (col.field === 'status') {
+          const s = statusList.find(st => String(st.id) === String(value));
+          value = s ? s.name : value;
+        }
+
+        // Sicherstellen, dass der Wert ein String ist und Anführungszeichen für CSV escaped werden
+        const cleanValue = value !== undefined && value !== null ? String(value).replace(/"/g, '""') : "";
+        return `"${cleanValue}"`; 
+      }).join(';');
+    });
+
+    // 4. Download mit BOM für Excel (Umlaute)
+    const csvContent = "\uFEFF" + [header, ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `inventar_export_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
 
  
   const handleAddClick = () => {
@@ -314,7 +371,7 @@ function Inventory(props) {
         ];
       }
     }
-  ];
+  ].filter(Boolean);;
 
   return (
     <div style={{ padding: 24 }}>
@@ -347,7 +404,10 @@ function Inventory(props) {
           sx={{
             backgroundColor: "#fff",
             borderRadius: 2,
-            boxShadow: 2
+            boxShadow: 2,
+            "& .MuiDataGrid-toolbarContainer": {
+              padding: "8px", // Erzwingt Sichtbarkeit der Toolbar-Area
+            }
           }}
         />
       </div>
@@ -363,6 +423,12 @@ function Inventory(props) {
           </Button>
         </Box>
       )}
+      <Button
+        variant="outlined"
+        onClick={() => exportToCSV(items, columns, users, status)}
+      >
+        CSV Exportieren
+      </Button>
 
     </div>
   );
