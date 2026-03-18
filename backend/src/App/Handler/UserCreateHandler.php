@@ -5,13 +5,14 @@ namespace App\Handler;
 use App\Entity\Role;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Laminas\Diactoros\Response\JsonResponse;
 use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class UserEditHandler implements RequestHandlerInterface
+class UserCreateHandler implements RequestHandlerInterface
 {
     public function __construct(
         private ResponseFactoryInterface $responseFactory,
@@ -29,30 +30,28 @@ class UserEditHandler implements RequestHandlerInterface
         $json = $request->getBody()->getContents();
         $requestBody = json_decode($json, true);
 
-        if (!is_int($requestBody['id'])) {
-            $this->responseFactory->createResponse(400);
+        $user = new User();
+
+        $user->setFirstname($requestBody['firstname'] ?? null);
+        $user->setLastname($requestBody['lastname'] ?? null);
+        $user->setUsername($requestBody['username'] ?? null);
+        $user->setPassword($requestBody['password'] ?? null);
+
+        if (!is_array($requestBody['roles'] ?? null)) {
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+            return $this->responseFactory->createResponse(200);
         }
-
-        $item = $this->entityManager->find(User::class, $requestBody['id']);
-
-        if (!$item instanceof User) {
-            return $this->responseFactory->createResponse(500);
-        }
-
-        $item->setFirstname($requestBody['firstname'] ?? $item->getFirstname());
-        $item->setLastname($requestBody['lastname'] ?? $item->getLastname());
-        $item->setUsername($requestBody['username'] ?? $item->getUsername());
-        $item->setPassword($requestBody['password'] ?? $item->getPassword());
 
         $roles = $requestBody['roles'];
         foreach($roles as $role) {
             $role = $this->entityManager->find(Role::class, $role['id']);
 
-            $item->addRole($role);
+            $user->addRole($role);
         }
-
-        $this->entityManager->flush();
         
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
         return $this->responseFactory->createResponse(200);
     }
 }

@@ -16,7 +16,7 @@ class Role
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private int $id;
 
-    #[ORM\Column(type: Types::STRING)]
+    #[ORM\Column(type: Types::STRING, unique: true)]
     private string $name;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'roles')]

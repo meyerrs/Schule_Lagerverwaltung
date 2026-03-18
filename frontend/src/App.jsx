@@ -13,6 +13,12 @@ function App() {
   const [username, setUsername] = useState('');
   const [roles, setRoles] = useState([]);
 
+  const isAdmin = roles.some(role => role === 'admin');
+  const isInventoryAdmin = roles.some(role => role === 'inventarAdmin');
+
+
+  console.log("Is Admin: ", isAdmin);
+  console.log("Is InventoryAdmin: ", isInventoryAdmin);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,6 +28,7 @@ function App() {
     })
       .then(response => response.json())
       .then(data => {
+        console.log("data ", data);
         setUsername(data.username);
         setRoles(data.roles);
         setLoggedIn(true);
@@ -36,6 +43,8 @@ function App() {
     }).then(() => setLoggedIn(false));
   };
 
+  console.log("roles: ", roles);
+
   return (
     <>
       {loggedIn && (
@@ -49,12 +58,14 @@ function App() {
               Inventory
             </Button>
 
-            <Button
-              color="inherit"
-              onClick={() => navigate("/user")}
-            >
-              Users
-            </Button>
+            {isAdmin && (
+              <Button
+                color="inherit"
+                onClick={() => navigate("/user")}
+              >
+                Users
+              </Button>
+            )}
 
             <Box sx={{ flexGrow: 1 }} />
 
@@ -84,16 +95,17 @@ function App() {
         <Route
           path="/inventory"
           element={
-            loggedIn ? <Inventory /> : <Navigate to="/login" />
+            loggedIn ? <Inventory isAdmin={isAdmin} isInventoryAdmin={isInventoryAdmin} /> : <Navigate to="/login" />
           }
         />
-
-        <Route
-          path="/user"
-          element={
-            loggedIn ? <Users /> : <Navigate to="/login" />
-          }
-        />
+        {isAdmin && (
+          <Route
+            path="/user"
+            element={
+              loggedIn ? <Users /> : <Navigate to="/login" />
+            }
+          />
+        )}
       </Routes>
     </>
   );

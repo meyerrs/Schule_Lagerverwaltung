@@ -44,9 +44,17 @@ class LoginHandler implements RequestHandlerInterface
         ) {
             return $this->responseFactory->createResponse(401);
         }
+
+        $roles = $user->getRoles();
+
+        $roleNames = [];
+        foreach ($roles as $role) {
+            $roleNames[] = $role->getName();
+        }
         
         $date = new \DateTimeImmutable('+20 minutes');
         $session->set('user_id', $user->getId());
+        $session->set('roles', $roleNames);
         $session->set('experation_timestamp', $date->getTimestamp());
         
         return $this->responseFactory->createResponse(200);
