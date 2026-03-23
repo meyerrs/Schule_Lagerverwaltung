@@ -412,12 +412,13 @@ function Inventory(props) {
         />
       </div>
       
-      {isAdmin || isInventoryAdmin && (
+      {(isAdmin || isInventoryAdmin) && (
         <Box sx={{ mt: 2 }}>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleAddClick}
+            sx={{ marginBottom: "16px" }}
           >
             Hinzufügen
           </Button>
